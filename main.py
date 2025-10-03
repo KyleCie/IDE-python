@@ -1,5 +1,5 @@
 """
-A simple example of a Notepad-like text editor.
+A simple Notepad-like text editor.
 """
 
 import datetime
@@ -40,13 +40,14 @@ from pygments.style import Style as PygmentsStyle
 from pygments.lexers.python import PythonLexer
 from pygments.token import Keyword, Name, Comment, String, Number
 
+
 class MyPythonStyle(PygmentsStyle):
     default_style = ""
     styles = {
         Keyword: "#9549eb",
         Keyword.Constant: "#c08300",
         Keyword.Type: "#babd00",
-        Name: "#AA3131",
+        Name: "#C7C7C7",
         Name.Namespace: "#189200",
         Name.Function: "bold #d1ab01",
         Name.Function.Magic: "bold italic #d1ab01",
@@ -65,7 +66,9 @@ class MyPythonStyle(PygmentsStyle):
         Number: "#c08300",
     }
 
+
 pt_style = style_from_pygments_cls(MyPythonStyle)
+
 
 class ApplicationState:
     """
@@ -97,6 +100,7 @@ text_field = TextArea(
     scrollbar=True,
     line_numbers=True,
     style="class:text-area",
+    focus_on_click=True
 )
 
 
