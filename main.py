@@ -4,6 +4,7 @@ A simple Notepad-like text editor.
 
 import datetime
 from asyncio import Future, ensure_future
+import pyfiglet
 
 from prompt_toolkit.application import Application
 from prompt_toolkit.application.current import get_app
@@ -92,6 +93,13 @@ def get_statusbar_text():
 def get_statusbar_right_text():
     return f" {text_field.document.cursor_position_row + 1}:{text_field.document.cursor_position_col + 1}  "
 
+
+ascii_text = pyfiglet.figlet_format("Hello, Kyle.", font="roman")
+hello_window = Window(
+    content=FormattedTextControl("\n\n"+ascii_text, focusable=False),
+    align=WindowAlign.CENTER,
+    style="class:hello"
+)
 
 
 search_toolbar = SearchToolbar()
@@ -187,6 +195,8 @@ body = HSplit(
 )
 
 
+menu_body = hello_window
+
 # Global key bindings.
 bindings = KeyBindings()
 
@@ -231,6 +241,18 @@ def _(event):
 #
 # Handlers for menu items.
 #
+
+
+def menu_new_file():
+    get_app().exit()
+    run_app()
+    do_new_file()
+
+
+def menu_open_file():
+    get_app().exit()
+    run_app()
+    do_open_file()
 
 
 def do_open_file():
@@ -475,6 +497,38 @@ root_container = MenuContainer(
 )
 
 
+menu_container = MenuContainer(
+    body=menu_body,
+    menu_items=[
+        MenuItem(
+            "File",
+            children=[
+                MenuItem("New...", handler=menu_new_file),
+                MenuItem("Open...", handler=menu_open_file),
+                MenuItem("-", disabled=True),
+                MenuItem("Exit", handler=do_exit),
+            ],
+        ),
+        MenuItem(
+            "View",
+            children=[MenuItem("Status Bar", handler=do_status_bar)],
+        ),
+        MenuItem(
+            "Info",
+            children=[MenuItem("About", handler=do_about)],
+        ),
+    ],
+    floats=[
+        Float(
+            xcursor=True,
+            ycursor=True,
+            content=CompletionsMenu(max_height=16, scroll_offset=1),
+        ),
+    ],
+    key_bindings=bindings,
+)
+
+
 style = Style.from_dict(
     {
         "status": "reverse",
@@ -486,7 +540,7 @@ style = Style.from_dict(
 combined_style = merge_styles([pt_style, style])
 
 layout = Layout(root_container, focused_element=text_field)
-
+menu_layout = Layout(menu_container, focused_element=menu_container)
 
 application = Application(
     layout=layout,
@@ -497,7 +551,11 @@ application = Application(
 )
 
 menu_app = Application(
-
+    layout=menu_layout,
+    enable_page_navigation_bindings=True,
+    style=combined_style,
+    mouse_support=True,
+    full_screen=True,
 )
 
 def run_menu():
@@ -508,4 +566,4 @@ def run_app():
 
 
 if __name__ == "__main__":
-    run_app()
+    run_menu()
